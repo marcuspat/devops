@@ -1,0 +1,132 @@
+#####################################################################
+# SPLIT MASTER INSTALL
+
+#--------------------------------------------------------------------
+# Global Answers
+# These answers are always needed.
+
+# Y or N — Whether to install. Answer files must set this to Y.
+q_install=y
+
+# Y or N — Whether the installer has permission to install additional packages
+# from the OS’s repositories. If this is set to N, the installation will fail
+# if the installer detects missing dependencies.
+q_vendor_packages_install=y
+
+#--------------------------------------------------------------------
+# Components
+# These answers are always needed.
+
+# Y or N — Whether to install the puppet master role.
+q_puppetmaster_install=y
+
+# Y or N — Whether to install the database support (the console Postgres server
+# and PuppetDB) role.
+q_puppetdb_install=n
+
+#--------------------------------------------------------------------
+# Puppet Agent Answers
+# These answers are always needed.
+
+# Y or N — This is a silent install option, default is N. When set to "Y", the
+# installer will skip master verification which allows the user to deploy agents
+# when they know the master won’t be available.
+q_skip_master_verification=n
+
+#--------------------------------------------------------------------
+# Puppet Master Answers
+# These answers are generally needed if you are installing the puppet master
+# role.
+
+# Y or N — Whether or not the installation is an all-in-one installation,
+# (i.e., are puppetdb and the console also being installed on this node).
+q_all_in_one_install=n
+
+# String — An identifying string for the puppet master. This ID must be unique
+# across your entire site. The server’s fully qualified domain name is often
+# used as the puppet master’s certname.
+q_puppetmaster_certname=pe-master.localdomain
+
+# String — Valid DNS names at which the puppet master can be reached. Must be a
+# comma-separated list. In a normal installation, defaults to
+# <hostname>,<hostname.domain>,puppet,puppet.<domain>.
+q_puppetmaster_dnsaltnames=pe-master,pe-master.localdomain
+
+# String — The hostname of the server running the console role. Only needed if
+# you are not installing the console role on the puppet master server.
+q_puppetmaster_enterpriseconsole_hostname=pe-console.localdomain
+
+# Integer — The port on which to contact the console server. Only needed if you
+# are not installing the console role on the puppet master server.
+q_puppetmaster_enterpriseconsole_port=443
+
+# y or n; MUST BE LOWERCASE — Whether to check for updates whenever the pe-httpd
+# service restarts. To get the correct update info, the server will pass some
+# basic, anonymous info to Puppet Labs’ servers. Specifically, it will transmit:
+# the IP address of the client
+# the type and version of the client’s OS
+# the installed version of PE
+# the number of nodes licensed and the number of nodes used
+# If you wish to disable update checks (e.g. if your company policy forbids
+# transmitting this information), you will need to set this to n. You can also
+# disable checking after installation by editing the
+# /etc/puppetlabs/installer/answers.install file.
+q_pe_check_for_updates=y
+
+# String — A publicly accessible hostname where the console can be accessed if
+# the host name resolves to a private interface (e.g., Amazon EC2). This is set
+# automatically by the installer on EC2 nodes, but can be set manually in
+# environments with multiple hostnames.
+#q_public_hostname=
+
+# String — The git url to be passed to the r10k.yaml file
+# This can be any URL that is supported by r10k ( and normally git )
+# This answer is OPTIONAL and only needed if you would like r10k configured
+# at time of the Puppet Enterprise installation on the master
+#q_puppetmaster_r10k_remote='git@your.git.server.com:puppet/control.git'
+
+# String — The local filesystem path on the master where the ssh private key
+# can be found and used by r10k. This answer is OPTIONAL and only needed if
+# would like r10k configured at time of the Puppet Enterprise installation.
+# This must be specified in conjunction with q_puppetmaster_r10k_remote
+# to be populated in the configuration file. This will enable rugged
+# support in r10k allowing you to use on systems without git installed.
+#q_puppetmaster_r10k_private_key=/root/.ssh/id_dsa
+
+# Y or N - Whether or not the file sync service should be enabled on the master
+# node.  This will be 'Y' by default for installs and 'N' by default for
+# upgrades because migrating an existing codedir to codedir-staging is a manual
+# process.  It should only be overridden if you have already made that migration.
+#
+# NOTE: For split installs, if you set this on your master, you must have the
+# same answer on the console node for correct classification or the changes
+# will be overriden during the first puppet run on the master.
+#q_puppetmaster_file_sync_service_enabled=
+
+# Y or N - Whether to automatically configure code-manager. This answer is
+# OPTIONAL and only needed if you would like code-manager to be configured at
+# install time based on r10k answers.
+#q_puppetmaster_code_manager_auto_configure=n
+
+# String - The database orchestrator will use.
+q_orchestrator_database_name=pe-orchestrator
+
+# String - The password for Orchestrator's root user.
+q_orchestrator_database_password=strongpassword9285
+
+# String - Orchestator’s root user name
+q_orchestrator_database_user=pe-orchestrator
+
+#--------------------------------------------------------------------
+# PuppetDB Answers
+
+# String — The hostname of the server running PuppetDB.
+q_puppetdb_hostname=pe-puppetdb.localdomain
+
+# Integer — The port where the PuppetDB server can be reached.
+q_puppetdb_port=8081
+
+# Whether to exit the installer (during upgrade) to perform the NC Data Migration process
+# See http://docs.puppetlabs.com/pe/3.8/install_upgrade_migration_tool.html
+
+q_exit_for_nc_migrate=n

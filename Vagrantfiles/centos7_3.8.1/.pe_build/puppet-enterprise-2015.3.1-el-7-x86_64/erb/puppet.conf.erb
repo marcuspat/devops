@@ -1,0 +1,22 @@
+<%# Answer Variable => Ruby Variable Translation -%>
+<%
+  @agent_server      = ENV["q_puppetagent_server"]
+  @agent_certname    = ENV["q_puppetagent_certname"]
+  @platform_name     = ENV["PLATFORM_NAME"]
+  @puppet_group      = ENV["PLATFORM_PUPPET_GROUP"]
+  @puppet_user       = ENV["PLATFORM_PUPPET_USER"]
+  @agent_environment = ENV["q_agent_environment"]
+-%>
+[main]
+    certname = <%= @agent_certname %>
+    server = <%= @agent_server %>
+    user  = <%= @puppet_user %>
+    group = <%= @puppet_group %>
+    archive_files = true
+    archive_file_server = <%= @agent_server %>
+
+[agent]
+    graph = true
+    <% if @agent_environment -%>
+    environment = <%= @agent_environment %>
+    <% end -%>

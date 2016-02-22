@@ -1,0 +1,33 @@
+# Stock all-in-one answers for 2015.x
+q_install=y
+q_vendor_packages_install=y
+q_puppetmaster_install=y
+q_all_in_one_install=y
+
+
+q_puppetagent_certname=pmaster2.localnet
+q_puppetmaster_certname=pmaster2.localnet
+q_puppetmaster_dnsaltnames=pmaster2.localnet,puppet
+
+q_puppet_enterpriseconsole_httpd_port=443
+q_puppet_enterpriseconsole_auth_password=puppetlabs
+
+q_database_install=y
+q_puppetdb_database_name=pe-puppetdb
+q_puppetdb_database_password=strongpassword1748
+q_puppetdb_database_user=pe-puppetdb
+
+q_exit_for_nc_migrate=n
+
+
+# Use Vagrant configuration instead of DNS
+q_database_host=pmaster2.localnet
+q_puppetdb_hostname=pmaster2.localnet
+q_puppet_enterpriseconsole_master_hostname=pmaster2.localnet
+q_puppetmaster_enterpriseconsole_hostname=pmaster2.localnet
+q_puppetca_hostname=pmaster2.localnet
+q_puppetagent_server=pmaster2.localnet
+
+
+# Additional customization
+q_pe_check_for_updates=n

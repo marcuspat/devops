@@ -1,0 +1,24 @@
+<%
+     @tmp_path = ENV['t_tmp_puppet']
+-%>
+include puppet_enterprise::params
+
+$console_client_certname = hiera(
+    'puppet_enterprise::profile::master::console_client_certname',
+    $puppet_enterprise::params::console_client_certname
+)
+$classifier_client_certname = hiera(
+    'puppet_enterprise::profile::master::classifier_client_certname',
+    $puppet_enterprise::params::classifier_client_certname
+)
+
+file { '<%= @tmp_path -%>/auth.conf':
+    ensure  => present,
+    content => template('puppet_enterprise/profile/master/auth.conf.erb'),
+} ->
+exec { 'diff <%= @tmp_path -%>/auth.conf /etc/puppetlabs/puppet/auth.conf > <%= @tmp_path -%>/auth.conf.diff':
+    path    => '/usr/bin',
+    onlyif  => 'which diff',
+    creates => '<%= @tmp_path -%>/auth.conf.diff',
+    returns => [0, 1],
+}

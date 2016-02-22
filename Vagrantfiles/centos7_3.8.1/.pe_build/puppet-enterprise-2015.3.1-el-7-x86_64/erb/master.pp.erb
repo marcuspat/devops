@@ -1,0 +1,57 @@
+<%# Answer Variable => Ruby Variable Translation -%>
+<%
+  @master_certname  = ENV["q_puppetmaster_certname"]
+  @console_certname = ENV["q_puppetmaster_enterpriseconsole_certname"]
+  @orchestrator_database_name     = ENV['q_orchestrator_database_name']
+  @orchestrator_database_user     = ENV['q_orchestrator_database_user']
+  @orchestrator_database_password = ENV['q_orchestrator_database_password']
+  @r10k_remote      = ENV["q_puppetmaster_r10k_remote"]
+  @r10k_private_key = ENV["q_puppetmaster_r10k_private_key"]
+  @file_sync_enabled = ENV["q_puppetmaster_file_sync_service_enabled"] == "y"
+  @code_manager_auto_configure = ENV['q_puppetmaster_code_manager_auto_configure'] == "y"
+  @install_classifier  = ENV["q_puppetmaster_external_node_terminus"] == "n" || ENV["IS_UPGRADE"] != "y"
+  @use_legacy_auth_conf = ENV['q_migrate_auth_conf_after_upgrade'] == 'n'
+-%>
+class { puppet_enterprise::profile::master:
+    certname                => '<%= @master_certname -%>',
+    console_server_certname => '<%= @console_certname -%>',
+<% if @install_classifier -%>
+    classifier_host         => '<%= @console_certname -%>',
+<% end -%>
+<% if ENV["q_puppetmaster_r10k_remote"] -%>
+    r10k_remote             => '<%= @r10k_remote -%>',
+    r10k_private_key        => '<%= @r10k_private_key -%>',
+<% end -%>
+<% if !@file_sync_enabled -%>
+    file_sync_enabled       => <%= @file_sync_enabled %>,
+<% end -%>
+<% if @code_manager_auto_configure -%>
+  code_manager_auto_configure => <%= @code_manager_auto_configure -%>,
+<% end -%>
+
+<% if ENV['t_puppetserver_java_args'] -%>
+    java_args               => <%= Hash[*ENV['t_puppetserver_java_args'].split.to_a] -%>,
+<% end -%>
+
+<% if @use_legacy_auth_conf %>
+    use_legacy_auth_conf    => <%= @use_legacy_auth_conf -%>,
+<% end -%>
+}
+
+class { puppet_enterprise::profile::certificate_authority: }
+
+class { puppet_enterprise::profile::amq::broker: }
+class { puppet_enterprise::profile::mcollective::agent: }
+class { puppet_enterprise::profile::mcollective::peadmin: }
+
+class { puppet_enterprise::profile::agent: }
+
+class { puppet_enterprise::profile::orchestrator:
+  database_name => '<%= @orchestrator_database_name -%>',
+  database_user => '<%= @orchestrator_database_user -%>',
+  database_password => '<%= @orchestrator_database_password -%>',
+  <%# we can't enable ssl on remote pg since the server might not support it -%>
+  <% if ENV['q_database_install'] != 'y' && ENV['q_puppetdb_hostname'] != ENV['q_database_host'] -%>
+  database_properties => '',
+  <% end -%>
+}

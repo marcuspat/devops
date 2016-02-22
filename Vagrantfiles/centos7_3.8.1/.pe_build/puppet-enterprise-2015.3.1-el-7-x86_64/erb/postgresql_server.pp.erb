@@ -1,0 +1,147 @@
+<%
+  @manage_kernel_shmmax = ENV['t_manage_kernel_shmmax'] == 'y'
+
+  @puppetdb_database = ENV["q_puppetdb_database_name"]
+  @puppetdb_user     = ENV["q_puppetdb_database_user"]
+  if ENV['t_manage_puppetdb_database'] == 'y'
+      @puppetdb_password = ENV["q_puppetdb_database_password"].gsub("'","")
+  end
+
+  @certname      = ENV['q_puppetdb_hostname']
+
+  @classifier_database = ENV["q_classifier_database_name"]
+  @classifier_user     = ENV["q_classifier_database_user"]
+  if ENV['t_manage_classifier_database'] == 'y'
+      @classifier_password = ENV["q_classifier_database_password"]
+  end
+
+  @rbac_database = ENV["q_rbac_database_name"]
+  @rbac_user     = ENV["q_rbac_database_user"]
+  if ENV['t_manage_rbac_database'] == 'y'
+      @rbac_password = ENV["q_rbac_database_password"]
+  end
+
+  @activity_database = ENV["q_activity_database_name"]
+  @activity_user     = ENV["q_activity_database_user"]
+  if ENV['t_manage_activity_database'] == 'y'
+      @activity_password = ENV["q_activity_database_password"]
+  end
+
+  @orchestrator_database = ENV["q_orchestrator_database_name"]
+  @orchestrator_user     = ENV["q_orchestrator_database_user"]
+  if ENV['t_manage_orchestrator_database'] == 'y'
+      @orchestrator_password = ENV["q_orchestrator_database_password"]
+  end
+
+  @shared_buffers             = ENV["q_database_shared_buffers"]
+  @maintenance_work_mem       = ENV["q_database_maintenance_work_mem"]
+  @effective_cache_size       = ENV["q_database_effective_cache_size"]
+  @wal_buffers                = ENV["q_database_wal_buffers"]
+  @work_mem                   = ENV["q_database_work_mem"]
+  @checkpoint_segments        = ENV["q_database_checkpoint_segments"]
+  @log_min_duration_statement = ENV["q_database_log_min_duration_statement"]
+
+  if ENV['t_existing_psql_ctype']
+    @existing_psql_ctype         = ENV['t_existing_psql_ctype']
+  end
+  if ENV['t_existing_psql_collate']
+    @existing_psql_collate       = ENV['t_existing_psql_collate']
+  end
+  if ENV['t_existing_psql_encoding']
+    @existing_psql_encoding      = ENV['t_existing_psql_encoding']
+  end
+
+  # Just in case this needs adjustment when running the installer
+  @pg_upgrade_timeout = ENV['PE_PG_UPGRADE_TIMEOUT'] || 3600
+-%>
+
+class { puppet_enterprise::profile::database:
+  certname                       => '<%= @certname -%>',
+  manage_kernel_shmmax           => <%= @manage_kernel_shmmax -%>,
+  puppetdb_database_name         => '<%= @puppetdb_database -%>',
+  puppetdb_database_user         => '<%= @puppetdb_user -%>',
+  puppetdb_database_password     => '<%= @puppetdb_password -%>',
+  classifier_database_name       => '<%= @classifier_database -%>',
+  classifier_database_user       => '<%= @classifier_user -%>',
+  classifier_database_password   => '<%= @classifier_password -%>',
+  rbac_database_name             => '<%= @rbac_database -%>',
+  rbac_database_user             => '<%= @rbac_user -%>',
+  rbac_database_password         => '<%= @rbac_password -%>',
+  activity_database_name         => '<%= @activity_database %>',
+  activity_database_user         => '<%= @activity_user %>',
+  activity_database_password     => '<%= @activity_password %>',
+  orchestrator_database_name     => '<%= @orchestrator_database %>',
+  orchestrator_database_user     => '<%= @orchestrator_user %>',
+  orchestrator_database_password => '<%= @orchestrator_password %>',
+  <% if @shared_buffers && ! @shared_buffers.empty? -%>
+  shared_buffers                 => '<%= @shared_buffers -%>',
+  <% end -%>
+  <% if @maintenance_work_mem && ! @maintenance_work_mem.empty? -%>
+  maintenance_work_mem           => '<%= @maintenance_work_mem -%>',
+  <% end -%>
+  <% if @effective_cache_size && ! @effective_cache_size.empty? -%>
+  effective_cache_size           => '<%= @effective_cache_size -%>',
+  <% end -%>
+  <% if @wal_buffers && ! @wal_buffers.empty? -%>
+  wal_buffers                    => '<%= @wal_buffers -%>',
+  <% end -%>
+  <% if @work_mem && ! @work_mem.empty? -%>
+  work_mem                       => '<%= @work_mem -%>',
+  <% end -%>
+  <% if @checkpoint_segments && ! @checkpoint_segments.empty? -%>
+  checkpoint_segments            => '<%= @checkpoint_segments -%>',
+  <% end -%>
+  <% if @log_min_duration_statement && ! @log_min_duration_statement.empty? -%>
+  log_min_duration_statement     => '<%= @log_min_duration_statement -%>',
+  <% end -%>
+  <% if @existing_psql_encoding && ! @existing_psql_encoding.empty? -%>
+  encoding                       => '<%= @existing_psql_encoding -%>',
+  <% end -%>
+  <%# This is a horrible hack, but it's the only way I could see to add extra
+  options to initdb during DB initialization by the pe_postgres module in the
+  time that I have available. -bh
+  Refer to https://github.com/puppetlabs/puppetlabs-pe_postgresql/blob/4.0.x/manifests/server/database.pp#L30 %>
+  <% if @existing_psql_ctype && ! @existing_psql_ctype.empty? && @existing_psql_collate && ! @existing_psql_collate.empty? -%>
+  locale                         => "<%= @existing_psql_ctype -%>",
+  ctype                          => "<%= @existing_psql_ctype -%>",
+  collate                        => "<%= @existing_psql_collate -%>",
+  <% end -%>
+
+}
+
+<% if ENV['t_backup_restore_pg'] == 'true' -%>
+$postgres_dir = "${puppet_enterprise::server_data_dir}/postgresql"
+
+$new_data_dir = "${postgres_dir}/${puppet_enterprise::params::postgres_version}/data"
+$new_bin_dir = $puppet_enterprise::server_bin_dir
+
+$old_data_dir = '/opt/puppet/var/lib/pgsql/9.2/data'
+$old_bin_dir = '/opt/puppet/var/lib/pgsql/9.2/bin'
+
+exec { 'migrate to new postgres':
+    environment => ['LD_LIBRARY_PATH=/opt/puppetlabs/server/apps/postgresql/lib:/opt/puppet/var/lib/pgsql/9.2/lib:$LD_LIBRARY_PATH'],
+    command     => "${new_bin_dir}/pg_upgrade -b ${old_bin_dir} -B ${new_bin_dir} -d ${old_data_dir} -D ${new_data_dir}",
+    user        => 'pe-postgres',
+    cwd         => $postgres_dir,
+    timeout     => <%= @pg_upgrade_timeout %>,
+    before      => Class['pe_postgresql::server::config'],
+    require     => Class['pe_postgresql::server::initdb'],
+}
+file { [
+    '/opt/puppet/var/lib/pgsql/9.2/lib',
+    '/opt/puppet/var/lib/pgsql/9.2/bin',
+    '/opt/puppet/var/lib/pgsql/9.2/share',
+    ]:
+    ensure  => absent,
+    force   => true,
+    require => Exec['migrate to new postgres'],
+}
+
+exec { 'vacuum the newly migrated database':
+    command     => "${new_bin_dir}/vacuumdb --analyze --all",
+    user        => 'pe-postgres',
+    cwd         => $postgres_dir,
+    timeout     => <%= @pg_upgrade_timeout %>,
+    require     => Class['pe_postgresql::server::service'],
+}
+<% end -%>

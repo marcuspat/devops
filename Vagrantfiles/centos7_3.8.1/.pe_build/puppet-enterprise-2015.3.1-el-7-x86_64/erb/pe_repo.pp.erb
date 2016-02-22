@@ -1,0 +1,11 @@
+<%
+    @base_path = ENV['q_tarball_server']
+-%>
+
+class { pe_repo:
+  <% if @base_path -%>
+  base_path => '<%= @base_path -%>',
+  <% end -%>
+}
+
+include pe_repo::platform::<%= ENV['t_pe_repo_puppet_class'] -%>
