@@ -1,0 +1,49 @@
+---
+- hosts: ec2-servers
+  remote_user: root
+  tasks:
+  - name: installs screen
+    yum: name=screen state=latest
+
+- hosts: ec2-servers
+  remote_user: root
+  tasks:
+    - name: test connection
+      ping:
+      remote_user: root
+
+- hosts: ec2-servers
+  remote_user: root
+  tasks:
+  - name: installs java
+    yum: name=java state=latest
+
+- hosts: ec2-servers
+  remote_user: root
+  tasks:
+  - name: installs git
+    yum: name=git state=latest
+
+- hosts: ec2-servers
+  remote_user: root
+  tasks:
+  - name: installs mysql server
+    yum: name=mysql state=latest
+
+- hosts: ec2-servers
+  remote_user: root
+  tasks:
+  - name: installs ntp
+    yum: name=ntp state=latest
+
+- hosts: ec2-servers
+  remote_user: root
+  tasks:
+  - name: installs whois
+    yum: name=whois state=latest
+
+- hosts: ec2-servers
+  remote_user: root
+  tasks:
+  - name: installs tcpdump
+    yum: name=tcpdump state=latest
