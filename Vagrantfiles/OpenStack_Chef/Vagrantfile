@@ -1,0 +1,159 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+ 
+VAGRANTFILE_API_VERSION = "2"
+
+$script = <<SCRIPT
+# Silly Ubuntu 12.04 doesn't have the
+# --stdin option in the passwd utility
+echo root:vagrant | chpasswd
+cat << EOF >> /etc/hosts
+192.168.236.10 controller
+192.168.236.11 chef
+192.168.236.12 compute1
+192.168.236.13 compute2
+192.168.236.14 cinder
+EOF
+SCRIPT
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+ 
+  config.vm.box = "ubuntu/trusty64"
+ 
+  # Turn off shared folders
+  config.vm.synced_folder ".", "/vagrant", id: "vagrant-root", disabled: true
+ 
+  # Begin chef
+  config.vm.define "chef" do |chef_config|
+    chef_config.vm.hostname = "chef"
+    chef_config.vm.provision "shell", inline: $script
+    # eth1 configured in the 192.168.236.0/24 network
+    chef_config.vm.network "private_network", ip: "192.168.236.10"
+    chef_config.vm.provider "vmware_workstation" do |v|
+        v.vmx["memsize"] = "512"
+        v.vmx["numvcpus"] = "1"
+    end
+    chef_config.vm.provider "vmware_fusion" do |v|
+        v.vmx["memsize"] = "512"
+        v.vmx["numvcpus"] = "1"
+    end
+ 
+    chef_config.vm.provider "virtualbox" do |v|
+        v.customize ["modifyvm", :id, "--memory", "512"]
+        v.customize ["modifyvm", :id, "--cpus", "1"]
+    end
+  end
+  # End chef
+ 
+ # Begin controller
+  config.vm.define "controller" do |controller_config|
+    controller_config.vm.hostname = "controller"
+    controller_config.vm.provision "shell", inline: $script
+    # eth1 configured in the 192.168.236.0/24 network
+    controller_config.vm.network "private_network", ip: "192.168.236.11"
+    controller_config.vm.provider "vmware_workstation" do |v|
+        v.vmx["memsize"] = "1024"
+        v.vmx["numvcpus"] = "2"
+    end
+ 
+    controller_config.vm.provider "vmware_fusion" do |v|
+        v.vmx["memsize"] = "1024"
+        v.vmx["numvcpus"] = "2"
+    end
+    controller_config.vm.provider "virtualbox" do |v|
+        v.customize ["modifyvm", :id, "--memory", "1024"]
+        v.customize ["modifyvm", :id, "--cpus", "2"]
+    end
+  end
+  # End controller
+ 
+  # Begin compute1
+  config.vm.define "compute1" do |compute1_config|
+    compute1_config.vm.hostname = "compute1"
+    compute1_config.vm.provision "shell", inline: $script
+    # eth1 configured in the 192.168.236.0/24 network
+    compute1_config.vm.network "private_network", ip: "192.168.236.12"
+    compute1_config.vm.provider "vmware_workstation" do |v|
+        v.vmx["memsize"] = "2048"
+        v.vmx["numvcpus"] = "2"
+        # eth2 left unconfigured so the Chef Cookbooks can configure it
+        v.vmx["ethernet2.present"] = "TRUE"
+        v.vmx["ethernet2.connectionType"] = "hostonly"
+        v.vmx["ethernet2.addressType"] = "generated"
+        v.vmx["ethernet2.virtualDev"] = "e1000"
+    end
+ 
+    compute1_config.vm.provider "vmware_fusion" do |v|
+        v.vmx["memsize"] = "2048"
+        v.vmx["numvcpus"] = "2"
+        # eth2 left unconfigured so the Chef Cookbooks can configure it
+        v.vmx["ethernet2.present"] = "TRUE"
+        v.vmx["ethernet2.connectionType"] = "hostonly"
+        v.vmx["ethernet2.addressType"] = "generated"
+        v.vmx["ethernet2.virtualDev"] = "e1000"
+    end
+ 
+    compute1_config.vm.provider "virtualbox" do |v|
+        v.customize ["modifyvm", :id, "--memory", "2048"]
+        v.customize ["modifyvm", :id, "--cpus", "2"]
+        # eth2 left unconfigured so the Chef Cookbooks can configure it
+        v.customize ["modifyvm", :id, "--nic3", "intnet"]
+    end
+  end
+  # End compute1
+ # Begin compute2
+  config.vm.define "compute2" do |compute2_config|
+    compute2_config.vm.hostname = "compute2"
+    compute2_config.vm.provision "shell", inline: $script
+    # eth1 configured in the 192.168.236.0/24 network
+    compute2_config.vm.network "private_network", ip: "192.168.236.13"
+    compute2_config.vm.provider "vmware_workstation" do |v|
+        v.vmx["memsize"] = "2048"
+        v.vmx["numvcpus"] = "2"
+        # eth2 left unconfigured so the Chef Cookbooks can configure it
+        v.vmx["ethernet2.present"] = "TRUE"
+        v.vmx["ethernet2.connectionType"] = "hostonly"
+        v.vmx["ethernet2.addressType"] = "generated"
+        v.vmx["ethernet2.virtualDev"] = "e1000"
+    end
+ 
+    compute2_config.vm.provider "vmware_fusion" do |v|
+        v.vmx["memsize"] = "2048"
+        v.vmx["numvcpus"] = "2"
+        # eth2 left unconfigured so the Chef Cookbooks can configure it
+        v.vmx["ethernet2.present"] = "TRUE"
+        v.vmx["ethernet2.connectionType"] = "hostonly"
+        v.vmx["ethernet2.addressType"] = "generated"
+        v.vmx["ethernet2.virtualDev"] = "e1000"
+    end
+ 
+    compute2_config.vm.provider "virtualbox" do |v|
+        v.customize ["modifyvm", :id, "--memory", "2048"]
+        v.customize ["modifyvm", :id, "--cpus", "2"]
+        # eth2 left unconfigured so the Chef Cookbooks can configure it
+        v.customize ["modifyvm", :id, "--nic3", "intnet"]
+    end
+  end
+  # End compute2
+ # Begin cinder
+  config.vm.define "cinder" do |cinder_config|
+    cinder_config.vm.hostname = "cinder"
+    cinder_config.vm.provision "shell", inline: $script
+    # eth1 configured in the 192.168.236.0/24 network
+    cinder_config.vm.network "private_network", ip: "192.168.236.14"
+    cinder_config.vm.provider "vmware_workstation" do |v|
+        v.vmx["memsize"] = "512"
+        v.vmx["numvcpus"] = "1"
+    end
+ 
+    cinder_config.vm.provider "vmware_fusion" do |v|
+        v.vmx["memsize"] = "512"
+        v.vmx["numvcpus"] = "1"
+    end
+    cinder_config.vm.provider "virtualbox" do |v|
+        v.customize ["modifyvm", :id, "--memory", "512"]
+        v.customize ["modifyvm", :id, "--cpus", "1"]
+    end
+  end
+  # End cinder
+end
