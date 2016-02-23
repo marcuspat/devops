@@ -5,7 +5,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box = "ubuntu/trusty64"
     config.vm.define 'lab' do |lab|
     lab.vm.hostname = 'lab.localnet'
-    lab.vm.network :private_network, ip: "192.168.125.55"
+    lab.vm.network :private_network, ip: "192.168.55.16"
     lab.vm.provider :virtualbox do |vbox|
     end
 end
