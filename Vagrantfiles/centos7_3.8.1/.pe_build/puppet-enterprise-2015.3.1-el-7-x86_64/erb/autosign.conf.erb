@@ -1,9 +1,0 @@
-<%# Answer Variable => Ruby Variable Translation -%>
-<%
-  @master_console_name  = ENV["q_puppetmaster_enterpriseconsole_hostname"]
-  @master_puppetdb_name = ENV["q_puppetdb_hostname"]
--%>
-pe-internal-dashboard
-pe-internal-classifier
-<%= @master_console_name %>
-<%= @master_puppetdb_name %>

@@ -1,8 +1,0 @@
-postgresql
-concat
-inifile
-stdlib
-apt
-firewall
-java_ks
-reboot

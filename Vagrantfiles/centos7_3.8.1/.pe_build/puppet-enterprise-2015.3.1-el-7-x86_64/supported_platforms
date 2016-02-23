@@ -1,4 +1,0 @@
-# Ensure platform is supported:
-
-# Supported platforms to check against: let's make a list!
-supported_platforms="el-6-x86_64 el-7-x86_64 sles-11-x86_64 sles-12-x86_64 ubuntu-12.04-amd64 ubuntu-14.04-amd64"
