@@ -57,11 +57,6 @@ cd playbooks
 ansible-playbook -i ec2.py ec2-server.yml
 \`\`\`
 
-**Web Server Setup:**
-\`\`\`bash
-ansible-playbook -i inventory webserver.yml
-\`\`\`
-
 ## 🔧 Requirements
 
 ### For Vagrant:
@@ -141,7 +136,6 @@ Contributions welcome! This collection of DevOps tools is designed to be practic
 
 ## 📚 Related Repositories
 
-- **IAC**: Infrastructure as Code with Terraform and Pulumi
 - **Misc_Ansible_Playbooks**: General Ansible automation
 - **terraform_ansible_jenkins_deployment**: Jenkins CI/CD setup
 
