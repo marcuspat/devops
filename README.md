@@ -36,26 +36,26 @@ Automation utilities:
 ### Vagrant Development Environments
 
 **CentOS Development Environment:**
-\`\`\`bash
+```bash
 cd Vagrantfiles/centos7_3.8.1
 vagrant up
 vagrant ssh
-\`\`\`
+```
 
 **Ubuntu Development Environment:**
-\`\`\`bash
+```bash
 cd Vagrantfiles/Ubuntu
 vagrant up
 vagrant ssh
-\`\`\`
+```
 
 ### Ansible Automation
 
 **EC2 Server Provisioning:**
-\`\`\`bash
+```bash
 cd playbooks
 ansible-playbook -i ec2.py ec2-server.yml
-\`\`\`
+```
 
 ## 🔧 Requirements
 
@@ -105,7 +105,7 @@ This repository demonstrates:
 ## 🔧 Configuration
 
 **Vagrant Configuration:**
-\`\`\`ruby
+```ruby
 # Example Vagrantfile configuration
 Vagrant.configure("2") do |config|
   config.vm.box = "centos/7"
@@ -115,10 +115,10 @@ Vagrant.configure("2") do |config|
     vb.cpus = 2
   end
 end
-\`\`\`
+```
 
 **Ansible Configuration:**
-\`\`\`yaml
+```yaml
 # Example playbook structure
 ---
 - hosts: webservers
@@ -128,7 +128,7 @@ end
       yum:
         name: nginx
         state: present
-\`\`\`
+```
 
 ## 🤝 Contributing
 
@@ -141,7 +141,7 @@ Contributions welcome! This collection of DevOps tools is designed to be practic
 
 ## 📝 License
 
-DevOps automation tools - Free to use and modify.
+MIT — see [LICENSE](LICENSE).
 
 ---
 
