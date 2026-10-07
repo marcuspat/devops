@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/banner.svg" alt="devops — animated banner" width="100%"></p>
+
 # DevOps Automation Collection
 
 Collection of DevOps automation scripts, Vagrant configurations, and Ansible playbooks for development environment setup and infrastructure management.
